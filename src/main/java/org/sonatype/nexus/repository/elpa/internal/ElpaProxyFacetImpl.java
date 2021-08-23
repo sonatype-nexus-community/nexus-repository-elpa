@@ -12,19 +12,14 @@
  */
 package org.sonatype.nexus.repository.elpa.internal;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.inject.Named;
-
-import java.io.IOException;
-import java.io.InputStream;
-
 import org.sonatype.nexus.repository.cache.CacheInfo;
 import org.sonatype.nexus.repository.config.Configuration;
-import org.sonatype.nexus.repository.proxy.ProxyFacet;
 import org.sonatype.nexus.repository.proxy.ProxyFacetSupport;
-import org.sonatype.nexus.repository.storage.*;
+import org.sonatype.nexus.repository.storage.Asset;
+import org.sonatype.nexus.repository.storage.Bucket;
+import org.sonatype.nexus.repository.storage.Component;
+import org.sonatype.nexus.repository.storage.StorageFacet;
+import org.sonatype.nexus.repository.storage.StorageTx;
 import org.sonatype.nexus.repository.transaction.TransactionalStoreBlob;
 import org.sonatype.nexus.repository.transaction.TransactionalTouchBlob;
 import org.sonatype.nexus.repository.transaction.TransactionalTouchMetadata;
@@ -33,6 +28,16 @@ import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.matchers.token.TokenMatcher;
 import org.sonatype.nexus.transaction.UnitOfWork;
+import org.sonatype.nexus.repository.view.payloads.TempBlob;
+
+import static org.joda.time.Duration.standardHours;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.inject.Inject;
+import javax.inject.Named;
+import java.io.IOException;
+import java.io.InputStream;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.repository.elpa.internal.AssetKind.ARCHIVE;
@@ -283,7 +288,7 @@ public class ElpaProxyFacetImpl
     if (asset == null) {
       return null;
     }
-    if (asset.markAsDownloaded()) {
+    if (asset.markAsDownloaded(standardHours(0))) {
       tx.saveAsset(asset);
     }
     return elpaDataAccess.toContent(asset, tx.requireBlob(asset.requireBlobRef()));
