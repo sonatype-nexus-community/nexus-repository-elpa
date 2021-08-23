@@ -19,3 +19,5 @@ Sonatype internal people:
 External contributors:
 
 ![Possibly You!](http://i.imgur.com/A3eScYul.jpg)
+
+* [Bill Ryder](https://github.com/bryder)
